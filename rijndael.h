@@ -1,6 +1,9 @@
 /*
  * TODO: Add your name and student number here, along with
  *       a brief description of this code.
+ *
+ * Name: Jiaxin Zhang
+ * Student Number: D23127255
  */
 
 #ifndef RIJNDAEL_H

@@ -1,6 +1,10 @@
 /*
  * TODO: Add your name and student number here, along with
  *       a brief description of this code.
+ * Name: Jiaxin Zhang
+ * Student Number: D23127255
+ *
+ *
  */
 
 #include <stdlib.h>
@@ -13,10 +17,29 @@
  */
 void sub_bytes(unsigned char *block) {
   // TODO: Implement me!
+  int i;
+  /* substitute all the values from the state with the value in the SBox
+   * using the state value as index for the SBox
+   */
+  for (i = 0; i < 16; i++) block[i] = getSBoxValue(state[i]);
 }
 
 void shift_rows(unsigned char *block) {
   // TODO: Implement me!
+  int i;
+  /* iterate over the 4 rows and call shiftRow() with that row */
+  for (i = 0; i < 4; i++) shiftRow(block + i * 4, i);
+}
+
+void shiftRow(unsigned char *state, unsigned char nbr) {
+  int i, j;
+  unsigned char tmp;
+  /* each iteration shifts the row to the left by 1 */
+  for (i = 0; i < nbr; i++) {
+    tmp = state[0];
+    for (j = 0; j < 3; j++) state[j] = state[j + 1];
+    state[3] = tmp;
+  }
 }
 
 void mix_columns(unsigned char *block) {
