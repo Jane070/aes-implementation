@@ -12,6 +12,8 @@
 #define BLOCK_ACCESS(block, row, col) (block[(row * 4) + col])
 #define BLOCK_SIZE 16
 
+unsigned char getSBoxValue(unsigned char num);
+
 /*
  * These should be the main encrypt/decrypt functions (i.e. the main
  * entry point to the library for programmes hoping to use it to
