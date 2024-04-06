@@ -11,6 +11,8 @@
 
 #define BLOCK_ACCESS(block, row, col) (block[(row * 4) + col])
 #define BLOCK_SIZE 16
+#define EXPANDED_KEY_SIZE \
+  176  // For 128-bit keys, the expanded key size is 176 bytes
 
 unsigned char getSBoxValue(unsigned char num);
 
