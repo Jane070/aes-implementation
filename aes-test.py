@@ -1,9 +1,9 @@
 import unittest
 import ctypes
 import secrets
-from aes.aes import AES  # 替换成你的Python AES模块
+from aes.aes import AES  
 
-# 假设你的C库名称为 libaes.so (Linux) 或 libaes.dll (Windows)
+
 c_aes = ctypes.CDLL('./rijndael.so')
 
 class TestAESEncryptionDecryption(unittest.TestCase):

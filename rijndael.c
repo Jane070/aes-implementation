@@ -65,18 +65,6 @@ unsigned char getSBoxValue(unsigned char num) { return sbox[num]; }
 unsigned char getSBoxInvert(unsigned char num) { return rsbox[num]; }
 unsigned char getRconValue(unsigned char num) { return Rcon[num]; }
 
-void print_block(const char *message, int round, unsigned char *block) {
-  if (round >= 0) {
-    printf("%s (Round %d): ", message, round);
-  } else {
-    printf("%s: ", message);
-  }
-  for (int i = 0; i < 16; ++i) {
-    printf("%02x ", block[i]);
-  }
-  printf("\n");
-}
-
 // Galois Field (256) Multiplication of two bytes.
 unsigned char gmul(unsigned char rhs, unsigned char lhs) {
   unsigned char peasant = 0;
@@ -144,9 +132,6 @@ void mix_columns(unsigned char *block) {
   }
 }
 
-/*
- * Operations used when decrypting a block
- */
 void invert_sub_bytes(unsigned char *block) {
   int i;
   // Replace each byte of the block with its equivalent in the inverse S-box for
@@ -291,31 +276,25 @@ unsigned char *aes_encrypt_block(unsigned char *plaintext, unsigned char *key) {
 
   // Initial round of adding the round key to the plaintext
   add_round_key(output, expandedKey);
-  print_block("RoundKey", -1, expandedKey);
-  print_block("After initial AddRoundKey", -1, output);
 
   // Perform 9 rounds of the AES encryption process
   for (int round = 1; round < 10; round++) {
     sub_bytes(output);
-    print_block("After SubBytes", round, output);
+
     shift_rows(output);
-    print_block("After ShiftRows", round, output);
+
     mix_columns(output);
-    print_block("After MixColumns", round, output);
+
     add_round_key(output, expandedKey + (BLOCK_SIZE * round));
-    print_block("RoundKey", -1, expandedKey + (BLOCK_SIZE * round));
-    print_block("After AddRoundKey", round, output);
   }
 
   // Final round: No MixColumns
   sub_bytes(output);
-  print_block("Final round after SubBytes", -1, output);
+
   shift_rows(output);
-  print_block("Final round after ShiftRows", -1, output);
+
   add_round_key(output,
                 expandedKey + (BLOCK_SIZE * 10));  // 160 = BLOCK_SIZE * 10
-  print_block("last round key: ", -1, expandedKey + (BLOCK_SIZE * 10));
-  print_block("Final round after AddRoundKey", -1, output);
 
   // Free the expanded key as it's no longer needed
   free(expandedKey);
