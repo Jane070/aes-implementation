@@ -13,4 +13,4 @@ jobs:
       - name: Test AES
         run: |
           python3 -m unittest aes-test.py
-        working-directory: ./aes-implementation
+        
