@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// AES S-box
 unsigned char sbox[256] = {
     0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b,
     0xfe, 0xd7, 0xab, 0x76, 0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
@@ -31,6 +32,7 @@ unsigned char sbox[256] = {
     0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f,
     0xb0, 0x54, 0xbb, 0x16};
 
+// AES Inverse S-box
 unsigned char rsbox[256] = {
     0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e,
     0x81, 0xf3, 0xd7, 0xfb, 0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87,
@@ -54,18 +56,20 @@ unsigned char rsbox[256] = {
     0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
     0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63,
     0x55, 0x21, 0x0c, 0x7d};
-// Array of round constants used in the key expansion.
+// Round constants for AES key expansion
 unsigned char Rcon[32] = {
     0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36,
     0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97,
     0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39,
 };
-
+// Retrieves a value from the S-box
 unsigned char getSBoxValue(unsigned char num) { return sbox[num]; }
+// Retrieves a value from the inverse S-box
 unsigned char getSBoxInvert(unsigned char num) { return rsbox[num]; }
+// Retrieves a round constant value by its index
 unsigned char getRconValue(unsigned char num) { return Rcon[num]; }
 
-// Galois Field (256) Multiplication of two bytes.
+// Multiplication in the Galois Field
 unsigned char gmul(unsigned char rhs, unsigned char lhs) {
   unsigned char peasant = 0;
   unsigned int irreducible = 0x11b;
@@ -91,12 +95,12 @@ void sub_bytes(unsigned char *block) {
   for (i = 0; i < 16; i++) block[i] = getSBoxValue(block[i]);
 }
 
+// Cyclically shifts row n in the state by n bytes
 void shift_rows(unsigned char *block) {
   unsigned char temp_block[16];
 
   for (int i = 0; i < 16; i += 4) {
-    // Directly copy first byte of each row and cyclically shift the remaining
-    // bytes to the right.
+    // First row remains unchanged
     temp_block[i] = block[i];
     temp_block[i + 1] = block[(i + 5) % 16];
     temp_block[i + 2] = block[(i + 10) % 16];
@@ -156,7 +160,7 @@ void invert_shift_rows(unsigned char *block) {
     block[i] = temp_block[i];
   }
 }
-
+// Reverses column mixing to retrieve the original column data
 void invert_mix_columns(unsigned char *block) {
   unsigned char temp_block[16];
 
@@ -210,12 +214,9 @@ void add_round_key(unsigned char *block, unsigned char *round_key) {
   for (i = 0; i < 16; i++) block[i] = block[i] ^ round_key[i];
 }
 
-/*
- * This function should expand the round key. Given an input,
- * which is a single 128-bit key, it should return a 176-byte
- * vector, containing the 11 round keys one after the other
- */
+// Expands the 128-bit key into 176 bytes for the AES key schedule
 unsigned char *expand_key(unsigned char *cipher_key) {
+  // Allocate memory for the expanded key
   unsigned char *expandedKey = malloc(EXPANDED_KEY_SIZE);
   if (!expandedKey) return NULL;
 
@@ -228,7 +229,7 @@ unsigned char *expand_key(unsigned char *cipher_key) {
     expandedKey[i] = cipher_key[i];
   }
   currentSize += BLOCK_SIZE;
-
+  // Continue expanding the key until all 176 bytes are created
   while (currentSize < EXPANDED_KEY_SIZE) {
     // Read the last 4 bytes of the current expanded key into t
     for (int i = 0; i < 4; i++) {
@@ -250,10 +251,7 @@ unsigned char *expand_key(unsigned char *cipher_key) {
   return expandedKey;
 }
 
-/*
- * The implementations of the functions declared in the
- * header file should go here
- */
+// Encrypts a single 16-byte block using the AES algorithm
 unsigned char *aes_encrypt_block(unsigned char *plaintext, unsigned char *key) {
   // Allocate memory for the output cipher block
   unsigned char *output =
@@ -302,13 +300,15 @@ unsigned char *aes_encrypt_block(unsigned char *plaintext, unsigned char *key) {
   return output;
 }
 
+// Decrypts a single 16-byte block using the AES algorithm
 unsigned char *aes_decrypt_block(unsigned char *ciphertext,
                                  unsigned char *key) {
+  // Allocate memory for the plaintext
   unsigned char *output =
       (unsigned char *)malloc(sizeof(unsigned char) * BLOCK_SIZE);
 
   if (!output) return NULL;
-
+  // Expand the key for AES
   unsigned char *expandedKey = expand_key(key);
   if (!expandedKey) {
     free(output);

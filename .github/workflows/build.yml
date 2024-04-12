@@ -10,3 +10,6 @@ jobs:
         run: |
           sudo apt install -y build-essential python-is-python3
           make
+      - name: Test AES
+        run: |
+          python3 -m unittest aes-test.py

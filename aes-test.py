@@ -33,7 +33,7 @@ class TestAESEncryptionDecryption(unittest.TestCase):
             # Check whether the encryption results of the two implementations are the same
             self.assertEqual(encrypted_bytes_c, encrypted_bytes_py)
 
-            # decryption：Cimplementation
+            # decryption：C implementation
             decrypted_c = c_aes.aes_decrypt_block(ctypes.c_char_p(encrypted_bytes_c), ctypes.c_char_p(key_buffer))
             decrypted_bytes_c = bytes(decrypted_c.contents)
 
